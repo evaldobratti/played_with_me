@@ -32,7 +32,7 @@ if os.environ.get('ENVIRONMENT', None):
     }
 else:
     import dj_database_url
-    DATABASES['default'] =  dj_database_url.config()    
+    DATABASES = {'default':  dj_database_url.config()}
 
 ALLOWED_HOSTS = []
 
@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'played_with_me_web'
 )
 
 MIDDLEWARE_CLASSES = (
