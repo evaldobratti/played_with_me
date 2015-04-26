@@ -1,3 +1,4 @@
+requests==2.6.2
 Django==1.8
 argparse==1.2.1
 distribute==0.7.3
@@ -7,6 +8,5 @@ django-toolbelt==0.0.1
 -e git+https://github.com/joshuaduffy/dota2api.git@6a82b370f0965ecdec802b29bcd3cc82a49517eb#egg=dota2api-dev
 gunicorn==19.3.0
 psycopg2==2.6
-requests==2.6.2
 static3==0.5.1
 wsgiref==0.1.2
