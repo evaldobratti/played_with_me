@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '7le@s!0j_r!44-0ieii$fd5ql3%l2zf6t2*iny@==z(8)1#a83'
+SECRET_KEY = open('played_with_me/my.key').readlines()[0]
 
 if os.environ.get('ENVIRONMENT', None):
     DEBUG = True
@@ -36,7 +36,6 @@ else:
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = (
@@ -46,7 +45,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'played_with_me_web'
+    'web_app'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -116,3 +115,22 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+LOGGING = {
+    'disable_existing_loggers': False,
+    'version': 1,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG', # message level to be written to console
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False, 
+        },
+        'django.db': { },
+    },
+}

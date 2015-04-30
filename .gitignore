@@ -1,4 +1,7 @@
+played_with_me/my.key
 venv
 *.pyc
 staticfiles
 db.sqlite3
+.idea
+*~
