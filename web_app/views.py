@@ -18,8 +18,15 @@ def index(request):
 
 
 @transaction.atomic
-def match_details(request, match_id):
+def match_detail(request, match_id):
     match = models.get_details_match(match_id)
     return render(request, 'web_app/match_detail.html', {
         'match': match
+    })
+
+
+def player_detail(request, player_id):
+    acc = models.get_account(int(player_id))
+    return render(request, 'web_app/account.html', {
+        'account': acc
     })

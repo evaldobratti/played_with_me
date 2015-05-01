@@ -41,7 +41,9 @@
         {% for player in match.detailmatchplayer_set.all %}
             <tr>
                 {% if player.player_account %}
-                    <th class="col-lg-1">{{ player.player_account.persona_name }}</th>
+                    <th class="col-lg-1">
+                        <a href="{% url 'web_app:player_details' player.player_account.account_id %}">{{ player.player_account.persona_name }}</a>
+                    </th>
                 {% else %}
                     <th class="col-lg-1">{{ 'private profile' }}</th>
                 {% endif %}
