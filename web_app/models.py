@@ -1,6 +1,19 @@
 from django.db import models
+import dota2api
 import logging
 # Create your models here.
+
+
+dota_api = dota2api.Initialise()
+
+
+def get_details_match(match_id):
+    match = DetailMatch.objects.filter(match_id=match_id)
+    if match:
+        return match[0]
+    else:
+        details = dota_api.get_match_details(match_id)
+        return parse_from_details_match(details)
 
 
 def parse_from_details_match(match_details):
@@ -30,7 +43,30 @@ def parse_from_details_match(match_details):
                                                         url_full_portrait=player_response.hero.url_full_portrait,
                                                         url_vertical_portrait=player_response.hero.url_vertical_portrait)
 
-        player = DetailMatchPlayer.objects.create(match=match, account_id=player_response.account_id,
+        steam_id = dota2api.convert_to_64_bit(player_response.account_id)
+        summary_response = dota_api.get_player_summaries(steam_id)
+        if summary_response:
+            account_response = summary_response[0]
+            account, account_created = Account.objects.get_or_create(steam_id=steam_id)
+
+            account.community_visibility_state = account_response.community_visibility_state
+            account.profile_state = account_response.profile_state
+            account.persona_name = account_response.persona_name
+            account.last_logoff = account_response.last_logoff
+            account.profile_url = account_response.profile_url
+            account.url_avatar = account_response.url_avatar
+            account.url_avatar_medium = account_response.url_avatar_medium
+            account.url_avatar_full = account_response.url_avatar_full
+            account.persona_state = account_response.persona_state
+            account.primary_clan_id = account_response.primary_clan_id
+            account.time_created = account_response.time_created
+            account.persona_state_flags = account_response.persona_state_flags
+            account.save()
+        else:
+            account = None
+
+        player = DetailMatchPlayer.objects.create(match=match, player_account=account,
+                                                  account_id=player_response.account_id,
                                                   player_slot=player_response.player_slot,
                                                   hero=hero, kills=player_response.kills,
                                                   deaths=player_response.deaths, assists=player_response.assists,
@@ -68,11 +104,20 @@ def parse_from_details_match(match_details):
     return match
 
 
-class UnsavedForeignKey(models.ForeignKey):
-    allow_unsaved_instance_assignment = True
-
-
-logger = logging.getLogger(__name__)
+class Account(models.Model):
+    steam_id = models.BigIntegerField()
+    community_visibility_state = models.IntegerField(null=True)
+    profile_state = models.IntegerField(null=True)
+    persona_name = models.CharField(max_length=500, null=True)
+    last_logoff = models.BigIntegerField(null=True)
+    profile_url = models.CharField(max_length=500, null=True)
+    url_avatar = models.CharField(max_length=500, null=True)
+    url_avatar_medium = models.CharField(max_length=500, null=True)
+    url_avatar_full = models.CharField(max_length=500, null=True)
+    persona_state = models.IntegerField(null=True)
+    primary_clan_id = models.BigIntegerField(null=True)
+    time_created = models.BigIntegerField(null=True)
+    persona_state_flags = models.BigIntegerField(null=True)
 
 
 class Hero(models.Model):
@@ -126,6 +171,7 @@ class DetailMatch(models.Model):
 
 class DetailMatchPlayer(models.Model):
     match = models.ForeignKey(DetailMatch)
+    player_account = models.ForeignKey(Account, null=True)
     account_id = models.BigIntegerField()
     player_slot = models.SmallIntegerField()
 
@@ -159,6 +205,10 @@ class DetailMatchAbilityUpgrade(models.Model):
     ability = models.ForeignKey(Ability)
     time = models.IntegerField()
     upgraded_lvl = models.SmallIntegerField()
+
+
+
+
 
 
 
