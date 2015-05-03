@@ -1,5 +1,5 @@
 from django.db import models
-from dota2api.api import Initialise
+from dota2api.api import *
 import logging
 # Create your models here.
 from django.db import transaction
@@ -21,7 +21,7 @@ def download_games():
 
 
 def get_account(account_id):
-    steam_id = dota2api.convert_to_64_bit(account_id)
+    steam_id = convert_to_64_bit(account_id)
     summaries = dota_api.get_player_summaries(steam_id)
 
     if summaries:
