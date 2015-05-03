@@ -1,10 +1,23 @@
 from django.db import models
-import dota2api
+from dota2api.api import Initialise
 import logging
 # Create your models here.
+from django.db import transaction
+
+dota_api = Initialise()
 
 
-dota_api = dota2api.Initialise()
+def download_games():
+    while True:
+        try:
+            last_match_id = None
+            matches = dota_api.get_match_history_by_seq_num(last_match_id)
+            for match in matches.matches:
+                with transaction.atomic():
+                    get_details_match(match.match_id)
+                    last_match_id = match.match_id
+        except Exception, e:
+            print e
 
 
 def get_account(account_id):
