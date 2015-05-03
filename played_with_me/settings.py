@@ -32,6 +32,7 @@ if os.environ.get('ENVIRONMENT', None):
     }
 else:
     import dj_database_url
+    DEBUG = True
     DATABASES = {'default':  dj_database_url.config()}
 
 ALLOWED_HOSTS = []
