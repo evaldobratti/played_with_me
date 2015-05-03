@@ -4,7 +4,7 @@ distribute==0.6.24
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-toolbelt==0.0.1
--e git+https://github.com/joshuaduffy/dota2api.git@b1dba1c7c8a0ef93a46967501aaaa7df105f2749#egg=dota2api-dev
+-e git+https://github.com/joshuaduffy/dota2api.git@6d25f3a2cec4d725008698a0add8747e6e1aa07a#egg=dota2api-dev
 gunicorn==19.3.0
 psycopg2==2.6
 requests==2.5.1
