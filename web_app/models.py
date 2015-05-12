@@ -7,43 +7,58 @@ from django.db import transaction
 dota_api = Initialise()
 
 
-def download_games():
+def get_until_success(get_function):
     while True:
         try:
-            last_match_id = None
-            matches = dota_api.get_match_history_by_seq_num(last_match_id)
+            return get_function()
+        except Exception as e:
+            import logging
+            logging.exception(e)
+
+
+def download_games():
+    last_match_id = None
+    while True:
+        try:
+            global last_match_id
+            #matches = get_until_success(lambda: dota_api.get_match_history_by_seq_num(last_match_id))
+            print last_match_id
+            matches = get_until_success(lambda: dota_api.get_match_history(88738111,
+                                                                           start_at_match_id=last_match_id))
             for match in matches.matches:
                 with transaction.atomic():
                     get_details_match(match.match_id)
-                    last_match_id = match.match_id
+                last_match_id = match.match_id
         except Exception, e:
-            print e
+            import logging
+            logging.exception(e)
 
 
 def get_account(account_id):
     steam_id = convert_to_64_bit(account_id)
-    summaries = dota_api.get_player_summaries(steam_id)
+    account, account_created = Account.objects.get_or_create(account_id=account_id)
 
-    if summaries:
-        account_response = summaries[0]
-        account, account_created = Account.objects.get_or_create(account_id=account_id)
+    if account_created:
+        summaries = get_until_success(lambda: dota_api.get_player_summaries(steam_id))
 
-        account.community_visibility_state = account_response.community_visibility_state
-        account.profile_state = account_response.profile_state
-        account.persona_name = account_response.persona_name
-        account.last_logoff = account_response.last_logoff
-        account.profile_url = account_response.profile_url
-        account.url_avatar = account_response.url_avatar
-        account.url_avatar_medium = account_response.url_avatar_medium
-        account.url_avatar_full = account_response.url_avatar_full
-        account.persona_state = account_response.persona_state
-        account.primary_clan_id = account_response.primary_clan_id
-        account.time_created = account_response.time_created
-        account.persona_state_flags = account_response.persona_state_flags
-        account.save()
-        return account
-    else:
-        return None
+        if summaries:
+            account_response = summaries[0]
+
+            account.community_visibility_state = account_response.community_visibility_state
+            account.profile_state = account_response.profile_state
+            account.persona_name = account_response.persona_name
+            account.last_logoff = account_response.last_logoff
+            account.profile_url = account_response.profile_url
+            account.url_avatar = account_response.url_avatar
+            account.url_avatar_medium = account_response.url_avatar_medium
+            account.url_avatar_full = account_response.url_avatar_full
+            account.persona_state = account_response.persona_state
+            account.primary_clan_id = account_response.primary_clan_id
+            account.time_created = account_response.time_created
+            account.persona_state_flags = account_response.persona_state_flags
+            account.save()
+
+    return account
 
 
 def get_details_match(match_id):
@@ -51,7 +66,7 @@ def get_details_match(match_id):
     if match:
         return match[0]
     else:
-        details = dota_api.get_match_details(match_id)
+        details = get_until_success(lambda: dota_api.get_match_details(match_id))
         return parse_from_details_match(details)
 
 

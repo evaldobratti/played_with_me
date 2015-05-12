@@ -3,7 +3,7 @@ argparse==1.2.1
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-toolbelt==0.0.1
--e git+https://github.com/joshuaduffy/dota2api.git@6d25f3a2cec4d725008698a0add8747e6e1aa07a#egg=dota2api-dev
+-e git+https://github.com/joshuaduffy/dota2api.git@7f8394f8edf2dbea1291f787fec60d06363f4b9c#egg=dota2api-dev
 gunicorn==19.3.0
 psycopg2==2.6
 requests==2.5.1
