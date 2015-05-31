@@ -38,7 +38,7 @@
         </thead>
 
         <tbody>
-        {% for player in match.detailmatchplayer_set.all %}
+        {% for player in match.players.all %}
             <tr>
                 {% if player.player_account %}
                     <th class="col-lg-1">
@@ -63,8 +63,13 @@
                 <th class="col-lg-1">{{ player.hero_healing }}</th>
                 <th class="col-lg-1">{{ player.level }}</th>
                 <th class="col-lg-1">
-                    {% for item in player.detailmatchplayeritem_set.all %}
+                    {% for item in player.items.all %}
                         <img height="30" width="40" src="{{ item.item.url_image }}">
+                    {% endfor %}
+                    {% for unit in player.additional_units.all %}
+                        {% for item in unit.items.all %}
+                            <img height="30" width="40" src="{{ item.item.url_image }}">
+                        {% endfor %}
                     {% endfor %}
                 </th>
 

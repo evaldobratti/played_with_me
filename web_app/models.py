@@ -115,6 +115,21 @@ def parse_from_details_match(match_details):
                                                   hero_healing=player_response.hero_healing,
                                                   level=player_response.level)
 
+        for additional_unit in player_response.additional_units:
+            unit, unit_created = AdditionalUnit.objects.get_or_create(unit_name=additional_unit.unit_name,
+                                                                      player=player)
+            for index, item_response in enumerate(additional_unit.items):
+                item, item_created = Item.objects.get_or_create(item_id=item_response.id,
+                                                                localized_name=item_response.localized_name,
+                                                                name=item_response.name,
+                                                                is_recipe=bool(item_response.is_recipe),
+                                                                in_secret_shop=item_response.in_secret_shop,
+                                                                cost=item_response.cost,
+                                                                in_side_shop=item_response.in_side_shop,
+                                                                url_image=item_response.url_image)
+
+                DetailMatchOwnerItem.objects.create(owner=unit, slot=index, item=item)
+
         for index, item_response in enumerate(player_response.items):
             item, item_created = Item.objects.get_or_create(item_id=item_response.id,
                                                             localized_name=item_response.localized_name,
@@ -125,7 +140,7 @@ def parse_from_details_match(match_details):
                                                             in_side_shop=item_response.in_side_shop,
                                                             url_image=item_response.url_image)
 
-            DetailMatchPlayerItem.objects.create(player=player, slot=index, item=item)
+            DetailMatchOwnerItem.objects.create(owner=player, slot=index, item=item)
 
         for upgrade in player_response.ability_upgrades:
             ability, ability_created = Ability.objects.get_or_create(ability_id=upgrade.ability,
@@ -204,8 +219,11 @@ class DetailMatch(models.Model):
     game_mode_name = models.CharField(max_length=50)
 
 
-class DetailMatchPlayer(models.Model):
-    match = models.ForeignKey(DetailMatch)
+class ItemOwner(models.Model):
+    pass
+
+class DetailMatchPlayer(ItemOwner):
+    match = models.ForeignKey(DetailMatch, related_name="players")
     player_account = models.ForeignKey(Account, null=True)
     account_id = models.BigIntegerField()
     player_slot = models.SmallIntegerField()
@@ -229,9 +247,14 @@ class DetailMatchPlayer(models.Model):
     level = models.IntegerField()
 
 
-class DetailMatchPlayerItem(models.Model):
+class AdditionalUnit(ItemOwner):
+    unit_name = models.CharField(max_length=50)
+    player = models.ForeignKey(DetailMatchPlayer, related_name="additional_units")
+
+
+class DetailMatchOwnerItem(models.Model):
     slot = models.SmallIntegerField()
-    player = models.ForeignKey(DetailMatchPlayer)
+    owner = models.ForeignKey(ItemOwner, related_name="items")
     item = models.ForeignKey(Item)
 
 

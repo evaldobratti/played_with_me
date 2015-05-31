@@ -1,5 +1,6 @@
 played_with_me/my.key
 venv
+env
 *.pyc
 staticfiles
 db.sqlite3

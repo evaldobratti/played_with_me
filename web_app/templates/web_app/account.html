@@ -4,4 +4,8 @@
 {% block content %}
     {{ account.persona_name }}
     <img src="{{ account.url_avatar_full }}">
+    {% for match in matches %}
+        {{ match.duration }} <br />
+    {% endfor %}
+
 {% endblock %}

@@ -27,6 +27,8 @@ def match_detail(request, match_id):
 
 def player_detail(request, player_id):
     acc = models.get_account(int(player_id))
+    models.DetailMatchPlayer.objects.aggregate()
     return render(request, 'web_app/account.html', {
-        'account': acc
+        'account': acc,
+        'matches': models.DetailMatch.objects.all().filter(players__player_account=acc)
     })
