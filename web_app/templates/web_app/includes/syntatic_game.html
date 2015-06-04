@@ -1,0 +1,20 @@
+<div class="row">
+    <div class="col-md-2">
+        <a href="{% url 'web_app:match_details' match.match_id %}">{{ match.match_id }}</a>
+    </div>
+    <div class="col-md-2">
+        Victory: {% if match.is_radiant_win %} Radiant {% else %} Dire {% endif %}
+    </div>
+    <div class="col-md-2">
+        Duration: {{ match.duration }}
+    </div>
+    <div class="col-md-2">
+        Duration: {{ match.game_mode_name }}
+    </div>
+</div>
+
+{% for detail_player in match.players.all %}
+    {% if detail_player.player_account in accounts %}
+        {% include 'web_app/includes/syntatic_player.html' with player=detail_player %}
+    {% endif %}
+{% endfor %}

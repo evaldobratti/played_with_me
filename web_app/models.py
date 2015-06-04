@@ -16,17 +16,20 @@ def get_until_success(get_function):
             logging.exception(e)
 
 
+def get_friends_of_account(account):
+    pass
+
+
 def download_games():
     last_match_id = None
     while True:
         try:
-            global last_match_id
-            #matches = get_until_success(lambda: dota_api.get_match_history_by_seq_num(last_match_id))
             print last_match_id
             matches = get_until_success(lambda: dota_api.get_match_history(88738111,
                                                                            start_at_match_id=last_match_id))
             for match in matches.matches:
                 with transaction.atomic():
+                    print 'parsing match: ' + str(match.match_id)
                     get_details_match(match.match_id)
                 last_match_id = match.match_id
         except Exception, e:
@@ -36,29 +39,28 @@ def download_games():
 
 def get_account(account_id):
     steam_id = convert_to_64_bit(account_id)
-    account, account_created = Account.objects.get_or_create(account_id=account_id)
+    summaries = get_until_success(lambda: dota_api.get_player_summaries(steam_id))
 
-    if account_created:
-        summaries = get_until_success(lambda: dota_api.get_player_summaries(steam_id))
+    if summaries:
+        account, account_created = Account.objects.get_or_create(account_id=account_id)
+        account_response = summaries[0]
 
-        if summaries:
-            account_response = summaries[0]
+        account.community_visibility_state = account_response.community_visibility_state
+        account.profile_state = account_response.profile_state
+        account.persona_name = account_response.persona_name
+        account.last_logoff = account_response.last_logoff
+        account.profile_url = account_response.profile_url
+        account.url_avatar = account_response.url_avatar
+        account.url_avatar_medium = account_response.url_avatar_medium
+        account.url_avatar_full = account_response.url_avatar_full
+        account.persona_state = account_response.persona_state
+        account.primary_clan_id = account_response.primary_clan_id
+        account.time_created = account_response.time_created
+        account.persona_state_flags = account_response.persona_state_flags
+        account.save()
+        return account
 
-            account.community_visibility_state = account_response.community_visibility_state
-            account.profile_state = account_response.profile_state
-            account.persona_name = account_response.persona_name
-            account.last_logoff = account_response.last_logoff
-            account.profile_url = account_response.profile_url
-            account.url_avatar = account_response.url_avatar
-            account.url_avatar_medium = account_response.url_avatar_medium
-            account.url_avatar_full = account_response.url_avatar_full
-            account.persona_state = account_response.persona_state
-            account.primary_clan_id = account_response.primary_clan_id
-            account.time_created = account_response.time_created
-            account.persona_state_flags = account_response.persona_state_flags
-            account.save()
-
-    return account
+    return None
 
 
 def get_details_match(match_id):
@@ -88,7 +90,6 @@ def parse_from_details_match(match_details):
                                        game_mode=match_details.game_mode, game_mode_name=match_details.game_mode_name)
 
     for player_response in match_details.players:
-        print 'parsing' + str(player_response)
         hero, hero_created = Hero.objects.get_or_create(hero_id=player_response.hero.id,
                                                         localized_name=player_response.hero.localized_name,
                                                         name=player_response.hero.name,
@@ -221,6 +222,7 @@ class DetailMatch(models.Model):
 
 class ItemOwner(models.Model):
     pass
+
 
 class DetailMatchPlayer(ItemOwner):
     match = models.ForeignKey(DetailMatch, related_name="players")

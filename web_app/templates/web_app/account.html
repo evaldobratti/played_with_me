@@ -4,8 +4,24 @@
 {% block content %}
     {{ account.persona_name }}
     <img src="{{ account.url_avatar_full }}">
-    {% for match in matches %}
-        {{ match.duration }} <br />
-    {% endfor %}
-
+    <table>
+        <tbody>
+        {% for friend in friends %}
+            <tr class="row">
+                <td class="col-md-1">
+                    <a href="{% url 'web_app:player_details' friend.account_id %}">{{ friend.persona_name }}</a>
+                </td>
+                <td class="col-md-1">
+                    {% with account.account_id|stringformat:"s"|add:"/" as account_url %}
+                        {% with friend.account_id|stringformat:"s"|add:"/" as friend_url %}
+                            {% with account_url|add:friend_url as blah %}
+                                <a href="{% url 'web_app:friends_detail' blah %}">{{ friend.qtd }}</a>
+                            {% endwith %}
+                        {% endwith %}
+                    {% endwith %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

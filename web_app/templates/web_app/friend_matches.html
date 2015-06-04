@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+    <table class="table table-striped">
+    {% for a in accounts %}
+            <tr>
+                <td>
+                    {% include 'web_app/includes/syntatic_account.html' with account=a %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    You guys have {{ matches|length }} matches together.
+    <table class="table table-striped">
+        {% for m in matches %}
+            <tr>
+                <td>
+                    {% include "web_app/includes/syntatic_game.html" with match=m accounts=accounts %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
