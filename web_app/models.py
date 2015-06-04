@@ -1,6 +1,7 @@
 from django.db import models
 from dota2api.api import *
 import logging
+import tasks
 # Create your models here.
 from django.db import transaction
 
@@ -10,7 +11,7 @@ dota_api = Initialise()
 def get_until_success(get_function):
     while True:
         try:
-            print 'ba'
+            tasks.aff('aaaa')
             return get_function()
         except Exception as e:
             import logging

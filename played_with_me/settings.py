@@ -32,14 +32,16 @@ if os.environ.get('ENVIRONMENT', None):
     }
 else:
     import dj_database_url
+
     DEBUG = True
-    DATABASES = {'default':  dj_database_url.config()}
+    DATABASES = {'default': dj_database_url.config()}
 
 ALLOWED_HOSTS = []
 
 # Application definition
 
 INSTALLED_APPS = (
+    'huey.djhuey',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,7 +49,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'web_app',
-    'celery'
+
 )
 
 MIDDLEWARE_CLASSES = (
@@ -110,6 +112,7 @@ ALLOWED_HOSTS = ['*']
 
 # Static asset configuration
 import os
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = 'staticfiles'
 STATIC_URL = '/static/'
@@ -119,20 +122,30 @@ STATICFILES_DIRS = (
 )
 
 LOGGING = {
-     'disable_existing_loggers': False,
-     'version': 1,
-     'handlers': {
-         'console': {
-             'class': 'logging.StreamHandler',
-             'level': 'DEBUG', # message level to be written to console
-         },
-     },
-     'loggers': {
-         '': {
-             'handlers': ['console'],
-             'level': 'DEBUG',
-             'propagate': False,
-         },
-         'django.db': { },
-     },
- }
+    'disable_existing_loggers': False,
+    'version': 1,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',  # message level to be written to console
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.db': {},
+    },
+}
+
+HUEY = {
+    'backend': 'huey.backends.sqlite_backend',  # required.
+    'name': 'unique',
+    'connection': {'location': 'db.sqlite3'},
+    'always_eager': False, # Defaults to False when running via manage.py run_huey
+
+    # Options to pass into the consumer when running ``manage.py run_huey``
+    'consumer_options': {'workers': 4},
+}
