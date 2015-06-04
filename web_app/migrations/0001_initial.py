@@ -114,6 +114,13 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='Team',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('team_name', models.CharField(max_length=20)),
+            ],
+        ),
+        migrations.CreateModel(
             name='AdditionalUnit',
             fields=[
                 ('itemowner_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='web_app.ItemOwner')),
@@ -142,8 +149,8 @@ class Migration(migrations.Migration):
                 ('hero_healing', models.IntegerField()),
                 ('level', models.IntegerField()),
                 ('hero', models.ForeignKey(to='web_app.Hero')),
-                ('match', models.ForeignKey(to='web_app.DetailMatch')),
                 ('player_account', models.ForeignKey(to='web_app.Account', null=True)),
+                ('team', models.ForeignKey(to='web_app.Team')),
             ],
             bases=('web_app.itemowner',),
         ),
@@ -155,7 +162,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='detailmatchowneritem',
             name='owner',
-            field=models.ForeignKey(to='web_app.ItemOwner'),
+            field=models.ForeignKey(related_name='items', to='web_app.ItemOwner'),
+        ),
+        migrations.AddField(
+            model_name='detailmatch',
+            name='dire_team',
+            field=models.ForeignKey(related_name='dire_team', to='web_app.Team'),
+        ),
+        migrations.AddField(
+            model_name='detailmatch',
+            name='radiant_team',
+            field=models.ForeignKey(related_name='radiant_team', to='web_app.Team'),
         ),
         migrations.AddField(
             model_name='detailmatchabilityupgrade',
@@ -165,6 +182,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='additionalunit',
             name='player',
-            field=models.ForeignKey(to='web_app.DetailMatchPlayer'),
+            field=models.ForeignKey(related_name='additional_units', to='web_app.DetailMatchPlayer'),
         ),
     ]

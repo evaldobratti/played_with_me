@@ -10,9 +10,11 @@ dota_api = Initialise()
 def get_until_success(get_function):
     while True:
         try:
+            print 'ba'
             return get_function()
         except Exception as e:
             import logging
+
             logging.exception(e)
 
 
@@ -34,6 +36,7 @@ def download_games():
                 last_match_id = match.match_id
         except Exception, e:
             import logging
+
             logging.exception(e)
 
 
@@ -72,24 +75,8 @@ def get_details_match(match_id):
         return parse_from_details_match(details)
 
 
-def parse_from_details_match(match_details):
-    match = DetailMatch.objects.create(is_radiant_win=match_details.is_radiant_win, duration=match_details.duration,
-                                       start_time=match_details.start_time, match_id=match_details.match_id,
-                                       match_seq_num=match_details.match_seq_num,
-                                       tower_status_radiant=match_details.tower_status_radiant,
-                                       tower_status_dire=match_details.tower_status_dire,
-                                       barracks_status_radiant=match_details.barracks_status_radiant,
-                                       barracks_status_dire=match_details.barracks_status_dire,
-                                       cluster=match_details.cluster,
-                                       cluster_name=match_details.cluster_name,
-                                       first_blood_time=match_details.first_blood_time,
-                                       lobby_type=match_details.lobby_type, lobby_name=match_details.lobby_name,
-                                       human_players=match_details.human_players, league_id=match_details.league_id,
-                                       positive_votes=match_details.positive_votes,
-                                       negative_votes=match_details.negative_votes,
-                                       game_mode=match_details.game_mode, game_mode_name=match_details.game_mode_name)
-
-    for player_response in match_details.players:
+def load_team(team, players):
+    for player_response in players:
         hero, hero_created = Hero.objects.get_or_create(hero_id=player_response.hero.id,
                                                         localized_name=player_response.hero.localized_name,
                                                         name=player_response.hero.name,
@@ -100,7 +87,7 @@ def parse_from_details_match(match_details):
 
         account = get_account(player_response.account_id)
 
-        player = DetailMatchPlayer.objects.create(match=match, player_account=account,
+        player = DetailMatchPlayer.objects.create(team=team, player_account=account,
                                                   account_id=player_response.account_id,
                                                   player_slot=player_response.player_slot,
                                                   hero=hero, kills=player_response.kills,
@@ -151,6 +138,31 @@ def parse_from_details_match(match_details):
                                                      time=upgrade.time,
                                                      upgraded_lvl=upgrade.level)
 
+
+def parse_from_details_match(match_details):
+
+    radiant = Team.objects.create(team_name="Radiant")
+    dire = Team.objects.create(team_name="Dire")
+
+    load_team(radiant, [p for p in match_details.players if p.player_slot < 10])
+    load_team(dire, [p for p in match_details.players if p.player_slot > 10])
+
+    match = DetailMatch.objects.create(is_radiant_win=match_details.is_radiant_win, duration=match_details.duration,
+                                       start_time=match_details.start_time, match_id=match_details.match_id,
+                                       match_seq_num=match_details.match_seq_num,
+                                       tower_status_radiant=match_details.tower_status_radiant,
+                                       tower_status_dire=match_details.tower_status_dire,
+                                       barracks_status_radiant=match_details.barracks_status_radiant,
+                                       barracks_status_dire=match_details.barracks_status_dire,
+                                       cluster=match_details.cluster,
+                                       cluster_name=match_details.cluster_name,
+                                       first_blood_time=match_details.first_blood_time,
+                                       lobby_type=match_details.lobby_type, lobby_name=match_details.lobby_name,
+                                       human_players=match_details.human_players, league_id=match_details.league_id,
+                                       positive_votes=match_details.positive_votes,
+                                       negative_votes=match_details.negative_votes,
+                                       game_mode=match_details.game_mode, game_mode_name=match_details.game_mode_name,
+                                       radiant_team=radiant, dire_team=dire)
     return match
 
 
@@ -197,6 +209,10 @@ class Ability(models.Model):
     name = models.CharField(max_length=100)
 
 
+class Team(models.Model):
+    team_name = models.CharField(max_length=20)
+
+
 class DetailMatch(models.Model):
     is_radiant_win = models.BooleanField()
     duration = models.BigIntegerField()
@@ -218,6 +234,8 @@ class DetailMatch(models.Model):
     negative_votes = models.IntegerField()
     game_mode = models.IntegerField()
     game_mode_name = models.CharField(max_length=50)
+    radiant_team = models.ForeignKey(Team, null=False, related_name="radiant_team")
+    dire_team = models.ForeignKey(Team, null=False, related_name="dire_team")
 
 
 class ItemOwner(models.Model):
@@ -225,8 +243,8 @@ class ItemOwner(models.Model):
 
 
 class DetailMatchPlayer(ItemOwner):
-    match = models.ForeignKey(DetailMatch, related_name="players")
     player_account = models.ForeignKey(Account, null=True)
+    team = models.ForeignKey(Team, null=False)
     account_id = models.BigIntegerField()
     player_slot = models.SmallIntegerField()
 
@@ -265,5 +283,3 @@ class DetailMatchAbilityUpgrade(models.Model):
     ability = models.ForeignKey(Ability)
     time = models.IntegerField()
     upgraded_lvl = models.SmallIntegerField()
-
-
