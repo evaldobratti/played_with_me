@@ -149,7 +149,7 @@ logging.getLogger("requests").setLevel(logging.WARNING)
 HUEY = {
     'backend': 'huey.backends.redis_backend',  # required.
     'name': 'unique',
-    'connection': {'host': 'localhost', 'port': 6799},
+    'connection': {'host': os.environ['REDIS_HOST'], 'port': 6799, 'password': os.environ['REDIS_PWD']},
     'always_eager': False, # Defaults to False when running via manage.py run_huey
 
     # Options to pass into the consumer when running ``manage.py run_huey``
