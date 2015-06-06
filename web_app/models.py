@@ -195,7 +195,7 @@ class DetailMatch(models.Model):
     is_radiant_win = models.BooleanField()
     duration = models.BigIntegerField()
     start_time = models.BigIntegerField()
-    match_id = models.BigIntegerField()
+    match_id = models.BigIntegerField(unique=True)
     match_seq_num = models.BigIntegerField()
     tower_status_radiant = models.SmallIntegerField()
     tower_status_dire = models.SmallIntegerField()
