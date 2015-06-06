@@ -147,9 +147,9 @@ import logging
 logging.getLogger("requests").setLevel(logging.WARNING)
 
 HUEY = {
-    'backend': 'huey.backends.sqlite_backend',  # required.
+    'backend': 'huey.backends.redis_backend',  # required.
     'name': 'unique',
-    'connection': {'location': 'huey.sqlite3'},
+    'connection': {'host': 'localhost', 'port': 6379},
     'always_eager': False, # Defaults to False when running via manage.py run_huey
 
     # Options to pass into the consumer when running ``manage.py run_huey``
