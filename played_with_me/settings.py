@@ -22,7 +22,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '7le@s!0j_r!44-0ieii$fd5ql3%l2zf6t2*iny@==z(8)1#a83'
 
-if os.environ.get('ENVIRONMENT', None):
+is_dev = os.environ.get('ENVIRONMENT', None)
+if is_dev:
     DEBUG = True
     DATABASES = {
         'default': {
@@ -146,12 +147,13 @@ LOGGING = {
 import logging
 logging.getLogger("requests").setLevel(logging.WARNING)
 
-HUEY = {
-    'backend': 'huey.backends.redis_backend',  # required.
-    'name': 'unique',
-    'connection': {'host': os.environ['REDIS_HOST'], 'port': 6799, 'password': os.environ['REDIS_PWD']},
-    'always_eager': False, # Defaults to False when running via manage.py run_huey
+if not is_dev:
+    HUEY = {
+        'backend': 'huey.backends.redis_backend',  # required.
+        'name': 'unique',
+            'connection': {'host': os.environ['REDIS_HOST'], 'port': 6799, 'password': os.environ['REDIS_PWD']},
+        'always_eager': False, # Defaults to False when running via manage.py run_huey
 
-    # Options to pass into the consumer when running ``manage.py run_huey``
-    'consumer_options': {'workers': 4},
-}
+        # Options to pass into the consumer when running ``manage.py run_huey``
+        'consumer_options': {'workers': 4},
+    }

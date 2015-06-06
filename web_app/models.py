@@ -172,9 +172,9 @@ class Hero(models.Model):
 
 
 class Item(models.Model):
-    item_id = models.SmallIntegerField()
+    item_id = models.SmallIntegerField(unique=True)
     localized_name = models.CharField(max_length=40)
-    name = models.CharField(max_length=40, unique=True)
+    name = models.CharField(max_length=40)
     is_recipe = models.BooleanField()
     in_secret_shop = models.BooleanField()
     cost = models.SmallIntegerField()
