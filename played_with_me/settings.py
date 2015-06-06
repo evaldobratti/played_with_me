@@ -26,8 +26,12 @@ if os.environ.get('ENVIRONMENT', None):
     DEBUG = True
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'played_with_me',
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
+            'HOST': 'localhost',
+            'PORT': '5432'
         }
     }
 else:
@@ -139,11 +143,13 @@ LOGGING = {
         'django.db': {},
     },
 }
+import logging
+logging.getLogger("requests").setLevel(logging.WARNING)
 
 HUEY = {
     'backend': 'huey.backends.sqlite_backend',  # required.
     'name': 'unique',
-    'connection': {'location': 'db.sqlite3'},
+    'connection': {'location': 'huey.sqlite3'},
     'always_eager': False, # Defaults to False when running via manage.py run_huey
 
     # Options to pass into the consumer when running ``manage.py run_huey``

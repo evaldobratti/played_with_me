@@ -10,7 +10,7 @@
     <div class="col-md-1">
         <img width="105" height="55" src="{{ player.hero.url_full_portrait }}">
     </div>
-    <div class="col-md-1">{{ player.player_account.persona_name }}</div>
-    <div class="col-md-1">K: {{ player.kills }} D:{{ player.deaths }} A:{{ player.assists }} </div>
+    <div class="col-md-1"><a href="{% url 'web_app:player_details' player.player_account.account_id %}">{{ player.player_account.persona_name }}</a></div>
+    <div class="col-md-2">K: {{ player.kills }} D:{{ player.deaths }} A:{{ player.assists }} </div>
     <div class="col-md-1"></div>
 </div>

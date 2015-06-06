@@ -11,9 +11,18 @@
     <div class="col-md-2">
         Duration: {{ match.game_mode_name }}
     </div>
+    <div class="col-md-2">
+        Start: {{ match.start_time }}
+    </div>
 </div>
 
-{% for detail_player in match.players.all %}
+{% for detail_player in match.dire_team.players.all %}
+    {% if detail_player.player_account in accounts %}
+        {% include 'web_app/includes/syntatic_player.html' with player=detail_player %}
+    {% endif %}
+{% endfor %}
+
+{% for detail_player in match.radiant_team.players.all %}
     {% if detail_player.player_account in accounts %}
         {% include 'web_app/includes/syntatic_player.html' with player=detail_player %}
     {% endif %}

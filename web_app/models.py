@@ -11,31 +11,8 @@ dota_api = Initialise()
 def get_until_success(get_function):
     while True:
         try:
-            tasks.aff('aaaa')
             return get_function()
         except Exception as e:
-            import logging
-
-            logging.exception(e)
-
-
-def get_friends_of_account(account):
-    pass
-
-
-def download_games():
-    last_match_id = None
-    while True:
-        try:
-            print last_match_id
-            matches = get_until_success(lambda: dota_api.get_match_history(88738111,
-                                                                           start_at_match_id=last_match_id))
-            for match in matches.matches:
-                with transaction.atomic():
-                    print 'parsing match: ' + str(match.match_id)
-                    get_details_match(match.match_id)
-                last_match_id = match.match_id
-        except Exception, e:
             import logging
 
             logging.exception(e)
@@ -168,7 +145,7 @@ def parse_from_details_match(match_details):
 
 
 class Account(models.Model):
-    account_id = models.BigIntegerField()
+    account_id = models.BigIntegerField(unique=True)
     steam_id = models.BigIntegerField(null=True)
     community_visibility_state = models.IntegerField(null=True)
     profile_state = models.IntegerField(null=True)
@@ -187,7 +164,7 @@ class Account(models.Model):
 class Hero(models.Model):
     hero_id = models.SmallIntegerField()
     localized_name = models.CharField(max_length=50)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     url_small_portrait = models.CharField(max_length=300)
     url_large_portrait = models.CharField(max_length=300)
     url_full_portrait = models.CharField(max_length=300)
@@ -197,7 +174,7 @@ class Hero(models.Model):
 class Item(models.Model):
     item_id = models.SmallIntegerField()
     localized_name = models.CharField(max_length=40)
-    name = models.CharField(max_length=40)
+    name = models.CharField(max_length=40, unique=True)
     is_recipe = models.BooleanField()
     in_secret_shop = models.BooleanField()
     cost = models.SmallIntegerField()
@@ -245,7 +222,7 @@ class ItemOwner(models.Model):
 
 class DetailMatchPlayer(ItemOwner):
     player_account = models.ForeignKey(Account, null=True)
-    team = models.ForeignKey(Team, null=False)
+    team = models.ForeignKey(Team, null=False, related_name='players')
     account_id = models.BigIntegerField()
     player_slot = models.SmallIntegerField()
 

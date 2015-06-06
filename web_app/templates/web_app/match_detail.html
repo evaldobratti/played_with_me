@@ -38,7 +38,45 @@
         </thead>
 
         <tbody>
-        {% for player in match.players.all %}
+        {% for player in match.radiant_team.players.all %}
+            <tr>
+                {% if player.player_account %}
+                    <th class="col-lg-1">
+                        <a href="{% url 'web_app:player_details' player.player_account.account_id %}">{{ player.player_account.persona_name }}</a>
+                    </th>
+                {% else %}
+                    <th class="col-lg-1">{{ 'private profile' }}</th>
+                {% endif %}
+                <th class="col-lg-1">{{ player.player_slot }}</th>
+
+                <th class="col-lg-1"><img width="105" height="55" src="{{ player.hero.url_large_portrait }}"></th>
+                <th class="col-lg-1">{{ player.kills }}</th>
+                <th class="col-lg-1">{{ player.deaths }}</th>
+                <th class="col-lg-1">{{ player.assists }}</th>
+                <th class="col-lg-1">{{ player.gold }}</th>
+                <th class="col-lg-1">{{ player.last_hits }}</th>
+                <th class="col-lg-1">{{ player.denies }}</th>
+                <th class="col-lg-1">{{ player.gold_per_min }}</th>
+                <th class="col-lg-1">{{ player.xp_per_min }}</th>
+                <th class="col-lg-1">{{ player.gold_spent }}</th>
+                <th class="col-lg-1">{{ player.hero_damage }}</th>
+                <th class="col-lg-1">{{ player.hero_healing }}</th>
+                <th class="col-lg-1">{{ player.level }}</th>
+                <th class="col-lg-1">
+                    {% for item in player.items.all %}
+                        <img height="30" width="40" src="{{ item.item.url_image }}">
+                    {% endfor %}
+                    {% for unit in player.additional_units.all %}
+                        {% for item in unit.items.all %}
+                            <img height="30" width="40" src="{{ item.item.url_image }}">
+                        {% endfor %}
+                    {% endfor %}
+                </th>
+
+            </tr>
+
+        {% endfor %}
+        {% for player in match.dire_team.players.all %}
             <tr>
                 {% if player.player_account %}
                     <th class="col-lg-1">

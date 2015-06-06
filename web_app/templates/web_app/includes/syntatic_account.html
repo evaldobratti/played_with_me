@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-md-2">
-        Name: {{ account.persona_name }}
+        <a href="{% url 'web_app:player_details' account.account_id %}">{{ account.persona_name }}</a>
     </div>
     <div class="col-md-2">
         Id: {{ account.account_id }}

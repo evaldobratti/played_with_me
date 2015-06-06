@@ -12,7 +12,7 @@
             </tr>
         {% endfor %}
     </table>
-    You guys have {{ matches|length }} matches together.
+    You guys have {{ total_matches }} matches together.
     <table class="table table-striped">
         {% for m in matches %}
             <tr>
@@ -22,4 +22,20 @@
             </tr>
         {% endfor %}
     </table>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if matches.has_previous %}
+            <a href="?page={{ matches.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ matches.number }} of {{ matches.paginator.num_pages }}.
+        </span>
+
+        {% if matches.has_next %}
+            <a href="?page={{ matches.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
 {% endblock %}
