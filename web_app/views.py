@@ -25,7 +25,7 @@ def match_detail(request, match_id):
 
 def player_detail(request, player_id):
     import tasks
-
+    logging.info("requisitando download de " + str(player_id))
     tasks.download_games(player_id)
     acc = models.get_account(int(player_id))
     models.DetailMatchPlayer.objects.aggregate()
