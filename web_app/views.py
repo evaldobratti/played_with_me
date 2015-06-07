@@ -25,20 +25,15 @@ def match_detail(request, match_id):
 
 def player_detail(request, player_id):
     import tasks
+
     logging.info("requisitando download de " + str(player_id))
     tasks.download_games(player_id)
     acc = models.get_account(int(player_id))
     models.DetailMatchPlayer.objects.aggregate()
     raw = models.Account.objects.raw(
-        "SELECT " +
-        "  dmp2.player_account_id id, " +
-        "  count(*)  QTD " +
-        "FROM web_app_account acc JOIN web_app_detailmatchplayer dmp1 ON acc.id = dmp1.player_account_id " +
-        "  JOIN web_app_detailmatchplayer dmp2 ON dmp1.team_id = dmp2.team_id " +
-        "WHERE dmp1.player_account_id = " + str(acc.id) + " AND dmp2.player_account_id <> " + str(acc.id) + " " +
-        "GROUP BY dmp1.player_account_id, dmp2.player_account_id " +
-        "HAVING count(*) > 1 " +
-        " ORDER BY QTD DESC "
+        'SELECT dmp2.player_account_id as id,  count(*) as qtd    FROM web_app_account acc   JOIN web_app_detailmatchplayer dmp1 ON acc.id = dmp1.player_account_id   JOIN web_app_detailmatchplayer dmp2 ON dmp1.match_id = dmp2.match_id WHERE dmp1.player_account_id = ' + str(
+            acc.id) + ' and dmp2.player_account_id <> ' + str(
+            acc.id) + ' GROUP BY dmp1.player_account_id,dmp2.player_account_id HAVING count(*) > 10 ORDER BY count(*)   DESC'
     )
     return render(request, 'web_app/account.html', {
         'account': acc,
