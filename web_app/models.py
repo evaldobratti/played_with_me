@@ -11,6 +11,8 @@ dota_api = Initialise()
 def get_until_success(get_function):
     while True:
         try:
+            import time
+            time.sleep(1)
             return get_function()
         except Exception as e:
             import logging
