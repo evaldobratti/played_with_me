@@ -37,7 +37,7 @@ def player_detail(request, player_id):
         "  JOIN web_app_detailmatchplayer dmp2 ON dmp1.team_id = dmp2.team_id " +
         "WHERE dmp1.player_account_id = " + str(acc.id) + " AND dmp2.player_account_id <> " + str(acc.id) + " " +
         "GROUP BY dmp1.player_account_id, dmp2.player_account_id " +
-        "HAVING count(*) > 10 " +
+        "HAVING count(*) > 1 " +
         " ORDER BY QTD DESC "
     )
     return render(request, 'web_app/account.html', {
