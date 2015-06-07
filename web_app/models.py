@@ -205,10 +205,10 @@ class DetailMatch(models.Model):
     game_mode_name = models.CharField(max_length=50)
 
     def radiant_team(self):
-        return [p for p in self.players if p.player_slot < 10]
+        return self.players.all().filter(player_slot__lt=10)
 
     def dire_team(self):
-        return [p for p in self.players if p.player_slot > 10]
+        return self.players.all().filter(player_slot__gt=10)
 
 class ItemOwner(models.Model):
     pass
