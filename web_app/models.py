@@ -7,6 +7,9 @@ from django.db import transaction
 
 dota_api = Initialise()
 
+def get_total_matches_in_server(account):
+    result = get_until_success(lambda: dota_api.get_match_history(account.steam_id))
+    return result.total_results
 
 def get_until_success(get_function):
     while True:
@@ -217,7 +220,7 @@ class ItemOwner(models.Model):
 
 
 class DetailMatchPlayer(ItemOwner):
-    player_account = models.ForeignKey(Account, null=True)
+    player_account = models.ForeignKey(Account, null=True, related_name='match_players')
     match = models.ForeignKey(DetailMatch, null=False, related_name='players')
     account_id = models.BigIntegerField()
     player_slot = models.SmallIntegerField()

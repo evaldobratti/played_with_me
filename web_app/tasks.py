@@ -7,6 +7,7 @@ log = logging.getLogger('pwm_logger')
 
 @db_task()
 def download_games(account_id):
+    log.info("requisitando download de " + str(player_id))
     last_match_id = None
     while True:
         try:

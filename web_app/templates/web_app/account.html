@@ -2,26 +2,39 @@
 
 
 {% block content %}
-    {{ account.persona_name }}
-    <img src="{{ account.url_avatar_full }}">
-    <table>
-        <tbody>
-        {% for friend in friends %}
-            <tr class="row">
-                <td class="col-md-1">
-                    <a href="{% url 'web_app:player_details' friend.account_id %}">{{ friend.persona_name }}</a>
-                </td>
-                <td class="col-md-1">
-                    {% with account.account_id|stringformat:"s"|add:"/" as account_url %}
-                        {% with friend.account_id|stringformat:"s"|add:"/" as friend_url %}
-                            {% with account_url|add:friend_url as blah %}
-                                <a href="{% url 'web_app:friends_detail' blah %}">{{ friend.qtd }}</a>
+    <div class="row">
+        <div class="col-md-1">
+            {{ account.persona_name }}
+        </div>
+        <div class="col-md-3">
+            <img src="{{ account.url_avatar_full }}">
+        </div>
+        <div class="col-md-1">
+        <button class="button" onclick="download_games('{% url 'web_app:player_download' account.account_id %}')">Synchronize Games</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-10">
+            <table>
+                <tbody>
+                {% for friend in friends %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'web_app:player_details' friend.account_id %}">{{ friend.persona_name }}</a>
+                        </td>
+                        <td>
+                            {% with account.account_id|stringformat:"s"|add:"/" as account_url %}
+                                {% with friend.account_id|stringformat:"s"|add:"/" as friend_url %}
+                                    {% with account_url|add:friend_url as blah %}
+                                        <a href="{% url 'web_app:friends_detail' blah %}">{{ friend.qtd }}</a>
+                                    {% endwith %}
+                                {% endwith %}
                             {% endwith %}
-                        {% endwith %}
-                    {% endwith %}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}

@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
 from django.db import transaction
-from django.http import HttpResponse
 from django.shortcuts import render
+from django.contrib import messages
 import models
 import dota2api
 import logging
+import os
+import tasks
+from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 logger = logging.getLogger(__name__)
 
+is_dev = os.environ.get('ENVIRONMENT', None)
 
 # Create your views here.
 def index(request):
@@ -24,10 +29,6 @@ def match_detail(request, match_id):
 
 
 def player_detail(request, player_id):
-    import tasks
-
-    logging.info("requisitando download de " + str(player_id))
-    tasks.download_games(player_id)
     acc = models.get_account(int(player_id))
     models.DetailMatchPlayer.objects.aggregate()
     raw = models.Account.objects.raw(
@@ -68,3 +69,30 @@ def friends_detail(request, players):
         'total_matches': total_matches,
         'matches': matches
     })
+
+
+def download_games(request, player_id):
+    try:
+        if not is_dev:
+            tasks.download_games(player_id)
+        account = models.Account.objects.get(account_id=player_id)
+        total_matches = models.get_total_matches_in_server(account)
+        already_downloaded_games = len(account.match_players.all())
+        matches_to_download = total_matches - already_downloaded_games
+
+        if matches_to_download > 0:
+            return JsonResponse({
+                'type': 'success',
+                'message': 'Started to download {} matches'.format(matches_to_download)
+            })
+        else:
+            return JsonResponse({
+                'type': 'success',
+                'message': 'All matches synchronized'
+            })
+    except Exception as e:
+        return JsonResponse({
+            'type': 'error',
+            'message': 'Erro: ' + e.message
+        })
+

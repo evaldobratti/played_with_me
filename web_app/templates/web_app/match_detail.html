@@ -38,7 +38,7 @@
         </thead>
 
         <tbody>
-        {% for player in match.radiant_team.players.all %}
+        {% for player in match.radiant_team %}
             <tr>
                 {% if player.player_account %}
                     <th class="col-lg-1">
@@ -76,7 +76,7 @@
             </tr>
 
         {% endfor %}
-        {% for player in match.dire_team.players.all %}
+        {% for player in match.dire_team %}
             <tr>
                 {% if player.player_account %}
                     <th class="col-lg-1">
